@@ -1,0 +1,48 @@
+natas0:
+    pwd: natas0
+    A senha pode ser encontrada em um comentário no HTML da página.
+
+natas1:
+    pwd: <secret-pwd>
+    A senha esta no mesmo lugar, ainda em um comentario na pagina. Embora o clique esteja bloqueado, voce ainda pode abrir o inspetor com o atalho F12, ou pelo menu do navegador.
+
+natas2:
+    pwd: <secret-pwd>
+    A primeira pista que temos neste level é uma imagem de 1x1 pixel. Podemos ver no HTML que a imagem está em um diretório chamado /files/. Sabendo da existência deste diretório, tentamos acessá-lo pela URL, e somos bem-sucedidos; podemos ver a lista do conteudo acessando 
+    http://natas2.natas.labs.overthewire.org/files/
+    Um arquivo nesta pasta contem senhas de varios usuarios, incluindo o natas3.
+
+natas3:
+    pwd: <secret-pwd>
+    A pista deste level é um comentário avisando que nem o Google poderá encontrar a senha desta vez. Isto nos leva a investigar se o site contem o arquivo robots.txt, que de fato contem. Este arquivo informa a robôs (incluso indexadores, por exemplo do google) para não acessarem o arquivo /s3cr3t/. Ao acessar esse arquivo pelo navegador, encontramos outr lista de senhas.
+
+natas4:
+    pwd: <secret-pwd>
+    A pagina nos informa que a requisicao só será autorizada se estiver "vindo" da url do natas5. Isto significa que a requisicao precisa ter um header "referer" com este valor. 
+    https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer
+    Pode-se editar a requisicao atraves do navegador, ou pelo curl 
+        curl -u natas4:<secret-pwd> --referer http://natas5.natas.labs.overthewire.org/ http://natas4.natas.labs.overthewire.org/
+
+natas5: 
+    pwd: <secret-pwd>
+    A pagina nos informa que precisamos estar logados. Ao investigar os headers, vemos que existe um header "Set-Cookie:loggedin=0", que informa ao navegador para criar um cookie com este valor. Os proximos requests mandados no endereco do cookie terao o valor deste cookie em um header chamado "Cookie". Para resolver este level podemos mudar o valor do cookie de 0 para 1, ou mandar um header conforme no curl abaixo 
+        curl -u natas5:<secret-pwd> -H "Cookie: loggedin=1" http://natas5.natas.labs.overthewire.org/ 
+
+natas6:
+    pwd: <secret-pwd>
+    como podemos ver o codigo fonte da pagina, observamos a lógica utilizada na "autenticação" da página; o valor mandado no formulario é comparado a um valor armazenado em um arquivo trazido de um include (import). 
+    Este include faz referencia ao path do arquivo. Acessamos este path e podemos ver o "secret". Mandando o secret pelo formulário, recebemos a chave do natas7 
+
+natas7:
+    pwd: <secret-pwd>
+    Há uma dica em um comentário no código que nos fala que a senha está no arquivo /etc/natas_webpass/natas8. Também temos alguns hiperlinks que nos direcionam para outras páginas através do valor do campo "page" na querystring => index.php?page=home . Tentando mudar o valor deste campo vemos um erro do PHP que nos mostra que este valor é utilizado em um include(), e este erro também nos informa a estrutura de pastas do servidor. Assim, se passarmos o endereço do arquivo mencionado no comentario, o PHP incluirá a senha. 
+
+natas8:
+    pwd: <secret-pwd>
+    temos um form assim como o do natas 6. como podemos ver o codigo fonte, sabemos a operacao que sera feita com o valor passado, e sabemos que este resultado sera comparado a um valor hard-coded. Como a operacao é reversível, basta revertê-la para achar o valor que faz a igualdade ser verdadeira e nos dar a senha.
+    Revertemos a funcao em PHP ->
+    echo base64_decode(strrev(hex2bin( <redacted> )));
+
+natas9:
+    pwd: <secret-pwd>
+    vendo o código fonte temos o uso do passthru() do PHP, com o input do formulario como parametro. "Escapando" do comando grep com um ";" podemos executar qualquer codigo no servior. Assim, temos a liberdade de ir ate o arquivo etc/natas_webpass/natas10 para ler a senha do proximo nivel.
