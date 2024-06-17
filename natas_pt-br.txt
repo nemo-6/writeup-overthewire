@@ -46,3 +46,8 @@ natas8:
 natas9:
     pwd: <secret-pwd>
     vendo o código fonte temos o uso do passthru() do PHP, com o input do formulario como parametro. "Escapando" do comando grep com um ";" podemos executar qualquer codigo no servior. Assim, temos a liberdade de ir ate o arquivo etc/natas_webpass/natas10 para ler a senha do proximo nivel.
+
+natas10:
+    assim como o natas9, podemos ver o codigo fonte e agora existe uma validacao que impede a injecao dos caracteres "|" "&" e ";". Isso dificulta um pouco a execução de qualquer código como fizemos no 9, porem podemos usar o grep sem precisar escapar dele. O input é inserido no comando grep logo após aos parametros, por isso passamos
+" --regexp=[.]* /etc/natas_webpass/natas10 " como input, que ao completar o grep do código fonte nos retornará matches da regex em todos os arquivos especificados.
+
